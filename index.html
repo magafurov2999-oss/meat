@@ -56,7 +56,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Шашлычник — мангал на углях в Бишкеке</title>
 <meta name="description" content="Кафе «Шашлычник», Бишкек. Жарим мясо с 1999 года. Шашлык, сеты, стейки на углях. Улица Мадиева, 6, Кок-Джар. Ежедневно 12:00–00:30.">
 <meta name="theme-color" content="#1A1A1A">
@@ -168,7 +168,11 @@ a:hover{color:var(--fire-hi)}
   border-radius:4px;
 }
 
-.wrap{width:100%;max-width:var(--wrap);margin-inline:auto;padding-inline:var(--gutter)}
+.wrap{
+  width:100%;max-width:var(--wrap);margin-inline:auto;
+  padding-left:max(var(--gutter),env(safe-area-inset-left));
+  padding-right:max(var(--gutter),env(safe-area-inset-right));
+}
 .sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .skip{
   position:absolute;left:12px;top:-70px;z-index:120;
@@ -367,10 +371,20 @@ p{margin:0 0 1em}
 .sec-head h2{margin-bottom:14px}
 
 /* ── меню ────────────────────────────────────────────────── */
+/* Липкая панель фильтров.
+   Фон обязан быть СПЛОШНЫМ: раньше здесь стоял градиент, гаснущий
+   в прозрачность на нижних 28%, и сквозь него просвечивали карточки
+   меню, уезжающие под панель. Мягкий переход к содержанию делает
+   псевдоэлемент ПОД панелью, а не полупрозрачность внутри неё. */
 .menu-tools{
   position:sticky;top:70px;z-index:40;
   padding-block:16px;margin-bottom:26px;
-  background:linear-gradient(180deg,var(--coal) 72%,rgba(26,26,26,0));
+  background:var(--coal);
+}
+.menu-tools::after{
+  content:"";position:absolute;left:0;right:0;top:100%;height:18px;
+  background:linear-gradient(180deg,var(--coal),rgba(26,26,26,0));
+  pointer-events:none;
 }
 .search{position:relative;max-width:430px;margin-bottom:16px}
 .search svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:19px;height:19px;color:var(--cream-faint);pointer-events:none}
@@ -418,7 +432,10 @@ p{margin:0 0 1em}
 .menu-status{margin:20px 0 4px;font-size:14px;color:var(--cream-faint)}
 
 /* сетка блюд */
-.dishes{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;list-style:none;margin:0;padding:0}
+/* min(290px,100%) вместо голого 290px: на экране уже 290 колонка
+   сжимается до ширины контейнера, а не выталкивает страницу вбок.
+   Проверено на 280px — внешний экран Galaxy Fold. */
+.dishes{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(290px,100%),1fr));gap:14px;list-style:none;margin:0;padding:0}
 .dish{
   position:relative;overflow:hidden;
   display:flex;flex-direction:column;gap:9px;
@@ -454,7 +471,7 @@ p{margin:0 0 1em}
 /* ── сеты ────────────────────────────────────────────────── */
 .sets{position:relative;overflow:hidden;border-block:1px solid var(--hair)}
 .sets-in{position:relative;z-index:1}
-.set-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:16px;list-style:none;margin:0;padding:0}
+.set-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(268px,100%),1fr));gap:16px;list-style:none;margin:0;padding:0}
 .set{
   display:flex;flex-direction:column;gap:12px;padding:26px 24px;
   border-radius:var(--r);background:rgba(17,17,17,.62);
@@ -462,7 +479,9 @@ p{margin:0 0 1em}
 }
 .set-star{background:var(--ruby);border-color:var(--ruby)}
 .set-star .set-persons{color:rgba(245,230,211,.82)}
-.set-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+/* wrap, а не nowrap: на узком экране счётчик палочек уходит
+   на свою строку вместо того, чтобы вылезти за карточку. */
+.set-top{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:8px 12px}
 .set h3{font-size:22px}
 .set-sticks{
   font-family:var(--slab);font-weight:900;font-size:15px;
@@ -521,7 +540,7 @@ p{margin:0 0 1em}
 .aside-list b{color:var(--cream);font-weight:600}
 
 /* ── контакты ────────────────────────────────────────────── */
-.cont-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:16px;list-style:none;margin:0;padding:0}
+.cont-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(258px,100%),1fr));gap:16px;list-style:none;margin:0;padding:0}
 .cont{
   padding:24px;border-radius:var(--r);
   background:var(--coal-lift);border:1px solid var(--hair);
@@ -544,7 +563,9 @@ p{margin:0 0 1em}
 /* ── модалка ─────────────────────────────────────────────── */
 .modal{
   position:fixed;inset:0;z-index:100;display:none;
-  align-items:center;justify-content:center;padding:20px;
+  align-items:center;justify-content:center;
+  padding:max(20px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right))
+          max(20px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));
 }
 .modal.on{display:flex}
 .modal-scrim{position:absolute;inset:0;background:var(--scrim);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
@@ -587,7 +608,10 @@ p{margin:0 0 1em}
 /* ── мобильная панель действий ───────────────────────────── */
 .bar{
   position:fixed;left:0;right:0;bottom:0;z-index:70;display:none;gap:10px;
-  padding:10px var(--gutter) calc(10px + env(safe-area-inset-bottom));
+  padding-top:10px;
+  padding-left:max(var(--gutter),env(safe-area-inset-left));
+  padding-right:max(var(--gutter),env(safe-area-inset-right));
+  padding-bottom:max(10px,env(safe-area-inset-bottom));
   background:rgba(17,17,17,.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   border-top:1px solid var(--hair);
 }
@@ -595,7 +619,13 @@ p{margin:0 0 1em}
 @media (max-width:760px){
   .bar{display:flex}
   body{padding-bottom:80px}
-  .menu-tools{top:62px}
+  /* На телефоне одиннадцать чипов переносятся в пять-шесть строк, и липкая
+     панель занимает от 40 до 51 процента экрана — замерено на 414 и 375px.
+     Держать полэкрана под фильтрами хуже, чем прокрутить к ним обратно,
+     поэтому здесь панель едет вместе с содержанием. Подписи категорий
+     при этом остаются целыми: сжимать их ради липкости нельзя. */
+  .menu-tools{position:static;background:transparent;padding-block:0 4px;margin-bottom:18px}
+  .menu-tools::after{display:none}
 }
 
 /* Уход мягче входа: короче по времени и всего 12px смещения,
@@ -603,6 +633,43 @@ p{margin:0 0 1em}
 .dishes.leaving .dish{
   opacity:0;transform:translateY(-12px);filter:blur(4px);
   transition:opacity .15s ease-in,transform .15s ease-in,filter .15s ease-in;
+}
+
+/* Короткий экран: телефон боком и маленькие старые аппараты.
+   Замерено: герой был 599px при экране 375 (iPhone SE боком),
+   647 при 390 и 801 при 568 — кнопки уезжали за сгиб.
+   Здесь снимаем нижнюю границу высоты и ужимаем вертикальные отступы,
+   чтобы призыв к действию попадал в первый экран. */
+@media (max-height:620px), (max-width:340px){
+  .hero-in{min-height:auto;padding-block:clamp(24px,5vh,44px)}
+  .hero h1{font-size:clamp(28px,5.6vw,46px);margin-bottom:12px}
+  .hero .lede{font-size:16px;margin-bottom:18px;max-width:52ch}
+  .hero-cta{margin-bottom:16px;gap:10px}
+  .hero-tags{gap:8px}
+  .motion-btn{bottom:10px}
+  .sec{padding-block:clamp(36px,7vw,72px)}
+  /* Та же беда, что и на телефоне стоймя: панель фильтров в ландшафте
+     занимала бы больше половины экрана. Прежнее правило отвязки было
+     по ширине, а телефон боком «широкий», поэтому оно не срабатывало. */
+  .menu-tools{position:static;background:transparent;padding-block:0 4px;margin-bottom:16px}
+  .menu-tools::after{display:none}
+}
+
+/* Наведение существует только там, где есть чем наводить.
+   На тач-экране :hover залипает после касания: карточка так и остаётся
+   приподнятой, кнопка — светящейся. Отклик на палец даёт :active. */
+@media (hover:none){
+  .dish:hover{border-color:rgba(245,230,211,.09);box-shadow:none;translate:none}
+  .btn-fire:hover{background:var(--fire);box-shadow:var(--lift-1)}
+  .btn-ghost:hover{border-color:var(--edge);box-shadow:none}
+  .btn-ruby:hover{background:var(--ruby)}
+  .chip:not([aria-selected="true"]):hover{color:var(--cream-dim);border-color:var(--edge)}
+  .rating:hover{border-color:var(--edge)}
+  .motion-btn:hover{color:var(--cream-dim);border-color:var(--edge)}
+  .nav a:hover{color:var(--cream-dim);background:transparent}
+  .foot-soc a:hover{color:var(--cream-dim);border-color:var(--edge)}
+  .modal-x:hover,.search-clear:hover{color:var(--cream-faint);background:transparent}
+  .search input:hover,.field input:hover,.field select:hover,.field textarea:hover{border-color:var(--edge)}
 }
 
 /* появление карточек */
